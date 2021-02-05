@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
 # Create your views here.
 import re
 
@@ -110,7 +109,7 @@ def multi_category_todo(request):
         context = {'lists':[]}
         if request.COOKIES:
             for key, value in request.COOKIES.items():#make contents into list format
-                if key == 'csrftoken':
+                if key in ['csrftoken', '_ga', '_gid', '_gat']:
                     pass
                 elif len(value) > 2:#if len(contents) > 2:
                     todo_list = value.split(',')
