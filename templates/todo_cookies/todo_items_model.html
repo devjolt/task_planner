@@ -1,0 +1,13 @@
+<form action="/todo/addTodoItem/" method = "post">
+    {% csrf_token %}
+    <input type="text" name="content">
+    <input type="submit" value="Add Todo Item">
+</form> 
+
+{% for item in items %}
+<p>{{item.item}}</p>
+<form action="/todo/deleteTodoItem/{{item.id}}/" method = "post">{% csrf_token %}
+    <input type="submit" value="Delete">
+</form> 
+{% endfor %}
+

@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,7 +27,7 @@ body{
 body::before
 {
     content:'';
-    position: absolute;
+    position: fixed;
     top:0;
     left:0;
     width: 100%;
@@ -36,7 +38,7 @@ body::before
 body::after
 {
     content:'';
-    position: absolute;
+    position: fixed;
     top:0;
     left:0;
     width: 100%;
@@ -106,17 +108,42 @@ todo-grid{
     border-left: 1px solid rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(5px);
 }
+
 .container .card .content
 {
     padding: 10px;
     text-align: center;
+    opacity: 0.5;
     transition: 0.5s;
 }
+
+.container .card:hover .content
+{
+    opacity: 1;
+    transition: 0.5s;
+}
+
+/*.container .card .content
+{
+    padding: 10px;
+    text-align: center;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.container .card:hover .content
+{
+    transform: translateY(0px);
+    opacity: 1;
+    transition: 0.5s;
+}
+*/
 .container .card .content h2
 {
     position: absolute;
-    top: -30px;
-    right: 24px;
+    top: -70px;
+    right: -30px;
     font-size:6em;
     color: rgba(255, 255, 255, 0.05);
     pointer-events: none;
@@ -130,8 +157,8 @@ todo-grid{
 .container .card .content h4
 {
     position: absolute;
-    bottom: 0px;
-    left: 10px;
+    bottom: -45px;
+    left: -30px;
     font-size:1.2em;
     color: rgba(255, 255, 255, 0.05);
     pointer-events: none;
@@ -164,7 +191,7 @@ input[type=text], select {
   border-radius: 4px;
   box-sizing: border-box;
 }
-
+/*
 input[type=submit] {
   width: flex;
   background-color: #32b5c4;
@@ -176,16 +203,72 @@ input[type=submit] {
   cursor: pointer;
   font-size: 0.8em;
 }
+*/
+input[type=submit] {
+  position: relative;
+  display: inline-block;
+  background: #fff;
+  margin-top: 15px;
+  color: #000;
+  border: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.8em;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
 
 input[type=submit]:hover {
   background-color: #45a049;
 
 }
 
+.bottomMenu {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  border-top: 1px solid #000;
+  background: red;
+  z-index: 1;
+}
 
-        </style>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static "css/todo.css" %}">
+
+body .clickEffect {
+    position:fixed;
+    box-sizing:border-box;
+    border-style:solid;border-color:#FFFFFF;
+    border-radius:50%;
+    animation:clickEffect 0.4s ease-out;
+    z-index:99999;
+}
+
+@keyframes clickEffect{
+
+    0% {
+    opacity:1;
+    width: 100px; 
+    height: 100px;
+    margin:-7px;
+    border-width:100px;
+    border-color: yellow;
+}
+    100%{
+    opacity:1;
+    width:10px; 
+    height:10px;
+    margin:-1px;
+    border-width:10px;
+    border-color: rgb(94, 94, 66)
+    }
+}
+
+    </style>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/todo.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
     </head>
     <body>
@@ -207,6 +290,7 @@ input[type=submit]:hover {
         {% if lists != None %}
         <div>
             {% for list in lists %}
+            <span class = '{{list.list_name}}'>
             
             <div class='todo-grid'>
                 <div class = 'container'>
@@ -215,13 +299,14 @@ input[type=submit]:hover {
                             <form method=post>
                                 {% csrf_token %}
                                 <input type='text' name='aD{{list.list_name}}'>
-                                <input action = '/' type="submit" value = "Add item">
+                                <input action = '/' type="submit" value = "add item">
                             </form>
 
                             <form method=post>
                                 {% csrf_token %}
                                 <input name='dL{{list.list_name}}' action = '/' type="submit" value = "delete list">
                             </form>
+                            <h4>{{list.list_name}}</h4>
                         </div>                   
                     </div>
                 </div>  
@@ -240,7 +325,8 @@ input[type=submit]:hover {
                     <div class = 'card'>
                         <div class = 'content'>
                             <h2>{{pair.num}}</h2>
-                            <h3>{{pair.item}}</h3>
+                            <h3>{{list.list_name}}</h3>
+                            <p>{{list.item}}</p>
                             <form method=post>
                                 {% csrf_token %}
                                 <input name='dI{{pair.item}}?{{list.list_name}}' action = '/' type="submit" value = "done">
@@ -253,11 +339,40 @@ input[type=submit]:hover {
                 {% endif %}
             </div>
             
-        
-        {% endfor %}
+            </span>
+            {% endfor %}
         </div>
         {% endif %}
+
+        <script type="text/javascript" src="{% static 'vanilla-tilt.js' %}"></script>
+
+        <script type="text/javascript">
+
+
+
+            VanillaTilt.init(document.querySelectorAll(".card"), {
+                max: 25,
+                speed: 400,
+                glare:true, 
+                "max-glare":1,
+                reverse:false,
+                reset:true,
+                gyroscope:true,
+                gyroscopeMinAngleX:     -80,     // This is the bottom limit of the device angle on X axis, meaning that a device rotated at this angle would tilt the element as if the mouse was on the left border of the element;
+                gyroscopeMaxAngleX:     80,      // This is the top limit of the device angle on X axis, meaning that a device rotated at this angle would tilt the element as if the mouse was on the right border of the element;
+                gyroscopeMinAngleY:     -80,     // This is the bottom limit of the device angle on Y axis, meaning that a device rotated at this angle would tilt the element as if the mouse was on the top border of the element;
+                gyroscopeMaxAngleY:     80,  
+                perspective:            1000, 
+            });
+            
+        </script>
     </body>
+
+    
+<!--<div class="bottomMenu"><p>Scroll down... </p></div>-->
+
+
+
 </html>
 
 <script>
@@ -270,6 +385,24 @@ input[type=submit]:hover {
     });
     return this;
 } 
-
 $(".top").shake();
+
+$(document).scroll(function() {
+  var y = $(this).scrollTop();
+  if (y > 50) {
+    $('.bottom').fadeOut();
+  } else {
+    $('.bottom').fadeIn();
+  }
+});
+
+function clickEffect(e){
+  var d=document.createElement("div");
+  d.className="clickEffect";
+  d.style.top=e.clientY+"px";d.style.left=e.clientX+"px";
+  document.body.appendChild(d);
+  d.addEventListener('animationend',function(){d.parentElement.removeChild(d);}.bind(this));
+}
+document.addEventListener('click',clickEffect);
+
 </script>

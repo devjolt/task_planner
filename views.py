@@ -131,6 +131,24 @@ def multi_category_todo(request):
 #lists
 #{'lists':[{'name of list': 'name', 'list':list }, {'name of list': 'name', 'list':list}...]}
 
+from django.forms import modelformset_factory
+from .models import ItemModel
+
+def todo_model(request):
+    items = ItemModel.objects.all()
+    return render(request, 'todo_cookies/todo_items_model.html',{'items':items}) 
+
+def addTodoView(request):
+    x = request.POST['content']
+    new_item = ItemModel(item = x)
+    new_item.save()
+    return HttpResponseRedirect('/todo') 
+
+def deleteTodoView(request, i):
+    y = ItemModel.objects.get(id= i)
+    y.delete()
+    return HttpResponseRedirect('/todo') 
+
 def kill_all(request):
     response = HttpResponseRedirect('/todo')
     for key, value in request.COOKIES.items():
